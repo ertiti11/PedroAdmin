@@ -1,14 +1,29 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Package, Tag, Hash, DollarSign } from 'lucide-react';
 
 const Products: React.FC = () => {
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    // Simulate data loading
+    const timer = setTimeout(() => {
+      setLoading(false);
+    }, 2000);
+
+    return () => clearTimeout(timer);
+  }, []);
+
   const products = [
     { id: 1, name: 'Kayak', category: 'Watercraft', quantity: 10, price: 50 },
     { id: 2, name: 'Paddle Board', category: 'Watercraft', quantity: 8, price: 40 },
     { id: 3, name: 'Pedal Boat', category: 'Watercraft', quantity: 5, price: 60 },
     { id: 4, name: 'Jet Ski', category: 'Watercraft', quantity: 3, price: 100 },
   ];
+
+  const SkeletonLoader = ({ className }: { className?: string }) => (
+    <div className={`animate-pulse bg-gray-200 rounded ${className}`}></div>
+  );
 
   return (
     <motion.div
@@ -28,38 +43,55 @@ const Products: React.FC = () => {
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-200">
-            {products.map((product) => (
-              <motion.tr 
-                key={product.id}
-                whileHover={{ backgroundColor: "#f3f4f6" }}
-                transition={{ duration: 0.2 }}
-              >
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <div className="flex items-center">
-                    <Package className="h-5 w-5 text-gray-400 mr-2" />
-                    {product.name}
-                  </div>
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <div className="flex items-center">
-                    <Tag className="h-5 w-5 text-gray-400 mr-2" />
-                    {product.category}
-                  </div>
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <div className="flex items-center">
-                    <Hash className="h-5 w-5 text-gray-400 mr-2" />
-                    {product.quantity}
-                  </div>
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <div className="flex items-center">
-                    <DollarSign className="h-5 w-5 text-gray-400 mr-2" />
-                    {product.price}
-                  </div>
-                </td>
-              </motion.tr>
-            ))}
+            {loading
+              ? Array.from({ length: 4 }).map((_, index) => (
+                  <tr key={index}>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <SkeletonLoader className="h-4 w-24" />
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <SkeletonLoader className="h-4 w-24" />
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <SkeletonLoader className="h-4 w-12" />
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <SkeletonLoader className="h-4 w-16" />
+                    </td>
+                  </tr>
+                ))
+              : products.map((product) => (
+                  <motion.tr 
+                    key={product.id}
+                    whileHover={{ backgroundColor: "#f3f4f6" }}
+                    transition={{ duration: 0.2 }}
+                  >
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="flex items-center">
+                        <Package className="h-5 w-5 text-gray-400 mr-2" />
+                        {product.name}
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="flex items-center">
+                        <Tag className="h-5 w-5 text-gray-400 mr-2" />
+                        {product.category}
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="flex items-center">
+                        <Hash className="h-5 w-5 text-gray-400 mr-2" />
+                        {product.quantity}
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="flex items-center">
+                        <DollarSign className="h-5 w-5 text-gray-400 mr-2" />
+                        {product.price}
+                      </div>
+                    </td>
+                  </motion.tr>
+                ))}
           </tbody>
         </table>
       </div>

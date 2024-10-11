@@ -1,9 +1,20 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { User, Package, Calendar } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 
 const Rentals: React.FC = () => {
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    // Simulate data loading
+    const timer = setTimeout(() => {
+      setLoading(false);
+    }, 2000);
+
+    return () => clearTimeout(timer);
+  }, []);
+
   const rentals = [
     { id: 1, client: 'John Doe', product: 'Kayak', startDate: '2024-03-15', endDate: '2024-03-17' },
     { id: 2, client: 'Jane Smith', product: 'Paddle Board', startDate: '2024-03-16', endDate: '2024-03-18' },
@@ -19,6 +30,10 @@ const Rentals: React.FC = () => {
     { name: 'Canoe', rentals: 6 },
   ];
 
+  const SkeletonLoader = ({ className }: { className?: string }) => (
+    <div className={`animate-pulse bg-gray-200 rounded ${className}`}></div>
+  );
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -30,16 +45,20 @@ const Rentals: React.FC = () => {
       <div className="mb-8">
         <h3 className="text-xl font-semibold mb-4">Rental Statistics</h3>
         <div className="bg-white p-4 rounded-lg shadow-md" style={{ height: '300px' }}>
-          <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={rentalStats}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="name" />
-              <YAxis />
-              <Tooltip />
-              <Legend />
-              <Bar dataKey="rentals" fill="#3b82f6" />
-            </BarChart>
-          </ResponsiveContainer>
+          {loading ? (
+            <SkeletonLoader className="h-full w-full" />
+          ) : (
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={rentalStats}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="name" />
+                <YAxis />
+                <Tooltip />
+                <Legend />
+                <Bar dataKey="rentals" fill="#3b82f6" />
+              </BarChart>
+            </ResponsiveContainer>
+          )}
         </div>
       </div>
       
@@ -54,38 +73,55 @@ const Rentals: React.FC = () => {
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-200">
-            {rentals.map((rental) => (
-              <motion.tr 
-                key={rental.id}
-                whileHover={{ backgroundColor: "#f3f4f6" }}
-                transition={{ duration: 0.2 }}
-              >
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <div className="flex items-center">
-                    <User className="h-5 w-5 text-gray-400 mr-2" />
-                    {rental.client}
-                  </div>
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <div className="flex items-center">
-                    <Package className="h-5 w-5 text-gray-400 mr-2" />
-                    {rental.product}
-                  </div>
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <div className="flex items-center">
-                    <Calendar className="h-5 w-5 text-gray-400 mr-2" />
-                    {rental.startDate}
-                  </div>
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <div className="flex items-center">
-                    <Calendar className="h-5 w-5 text-gray-400 mr-2" />
-                    {rental.endDate}
-                  </div>
-                </td>
-              </motion.tr>
-            ))}
+            {loading
+              ? Array.from({ length: 4 }).map((_, index) => (
+                  <tr key={index}>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <SkeletonLoader className="h-4 w-24" />
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <SkeletonLoader className="h-4 w-24" />
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <SkeletonLoader className="h-4 w-24" />
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <SkeletonLoader className="h-4 w-24" />
+                    </td>
+                  </tr>
+                ))
+              : rentals.map((rental) => (
+                  <motion.tr 
+                    key={rental.id}
+                    whileHover={{ backgroundColor: "#f3f4f6" }}
+                    transition={{ duration: 0.2 }}
+                  >
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="flex items-center">
+                        <User className="h-5 w-5 text-gray-400 mr-2" />
+                        {rental.client}
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="flex items-center">
+                        <Package className="h-5 w-5 text-gray-400 mr-2" />
+                        {rental.product}
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="flex items-center">
+                        <Calendar className="h-5 w-5 text-gray-400 mr-2" />
+                        {rental.startDate}
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="flex items-center">
+                        <Calendar className="h-5 w-5 text-gray-400 mr-2" />
+                        {rental.endDate}
+                      </div>
+                    </td>
+                  </motion.tr>
+                ))}
           </tbody>
         </table>
       </div>

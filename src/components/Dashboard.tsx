@@ -1,9 +1,20 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Users, ShoppingBag, Package, DollarSign, TrendingUp, AlertCircle } from 'lucide-react';
 import { PieChart, Pie, Cell, ResponsiveContainer, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts';
 
 const Dashboard: React.FC = () => {
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    // Simulate data loading
+    const timer = setTimeout(() => {
+      setLoading(false);
+    }, 2000);
+
+    return () => clearTimeout(timer);
+  }, []);
+
   const stats = [
     { title: 'Total Clients', value: 1250, icon: Users, color: 'bg-blue-500' },
     { title: 'Active Rentals', value: 48, icon: ShoppingBag, color: 'bg-green-500' },
@@ -37,6 +48,10 @@ const Dashboard: React.FC = () => {
     { id: 4, message: 'New product category "Snorkeling Gear" added', time: '2 days ago' },
   ];
 
+  const SkeletonLoader = ({ className }: { className?: string }) => (
+    <div className={`animate-pulse bg-gray-200 rounded ${className}`}></div>
+  );
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -58,7 +73,11 @@ const Dashboard: React.FC = () => {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm opacity-80">{stat.title}</p>
-                <p className="text-2xl font-bold">{stat.value}</p>
+                {loading ? (
+                  <SkeletonLoader className="h-8 w-24 mt-1" />
+                ) : (
+                  <p className="text-2xl font-bold">{stat.value}</p>
+                )}
               </div>
               <stat.icon size={24} />
             </div>
@@ -76,16 +95,20 @@ const Dashboard: React.FC = () => {
           transition={{ duration: 0.5, delay: 0.2 }}
         >
           <h3 className="text-xl font-semibold mb-4">Revenue Trend</h3>
-          <ResponsiveContainer width="100%" height={300}>
-            <LineChart data={revenueData}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="name" />
-              <YAxis />
-              <Tooltip />
-              <Legend />
-              <Line type="monotone" dataKey="revenue" stroke="#8884d8" activeDot={{ r: 8 }} />
-            </LineChart>
-          </ResponsiveContainer>
+          {loading ? (
+            <SkeletonLoader className="h-64 w-full" />
+          ) : (
+            <ResponsiveContainer width="100%" height={300}>
+              <LineChart data={revenueData}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="name" />
+                <YAxis />
+                <Tooltip />
+                <Legend />
+                <Line type="monotone" dataKey="revenue" stroke="#8884d8" activeDot={{ r: 8 }} />
+              </LineChart>
+            </ResponsiveContainer>
+          )}
         </motion.div>
 
         {/* Popular Products Chart */}
@@ -96,25 +119,29 @@ const Dashboard: React.FC = () => {
           transition={{ duration: 0.5, delay: 0.2 }}
         >
           <h3 className="text-xl font-semibold mb-4">Popular Products</h3>
-          <ResponsiveContainer width="100%" height={300}>
-            <PieChart>
-              <Pie
-                data={popularProducts}
-                cx="50%"
-                cy="50%"
-                labelLine={false}
-                outerRadius={80}
-                fill="#8884d8"
-                dataKey="value"
-                label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
-              >
-                {popularProducts.map((entry, index) => (
-                  <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                ))}
-              </Pie>
-              <Tooltip />
-            </PieChart>
-          </ResponsiveContainer>
+          {loading ? (
+            <SkeletonLoader className="h-64 w-full" />
+          ) : (
+            <ResponsiveContainer width="100%" height={300}>
+              <PieChart>
+                <Pie
+                  data={popularProducts}
+                  cx="50%"
+                  cy="50%"
+                  labelLine={false}
+                  outerRadius={80}
+                  fill="#8884d8"
+                  dataKey="value"
+                  label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                >
+                  {popularProducts.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                  ))}
+                </Pie>
+                <Tooltip />
+              </PieChart>
+            </ResponsiveContainer>
+          )}
         </motion.div>
       </div>
 
@@ -127,15 +154,25 @@ const Dashboard: React.FC = () => {
       >
         <h3 className="text-xl font-semibold mb-4">Recent Activities</h3>
         <ul className="space-y-3">
-          {recentActivities.map((activity) => (
-            <li key={activity.id} className="flex items-start space-x-3 text-sm">
-              <AlertCircle className="text-blue-500 mt-1 flex-shrink-0" />
-              <div>
-                <p>{activity.message}</p>
-                <p className="text-gray-500">{activity.time}</p>
-              </div>
-            </li>
-          ))}
+          {loading
+            ? Array.from({ length: 4 }).map((_, index) => (
+                <li key={index} className="flex items-start space-x-3">
+                  <SkeletonLoader className="h-6 w-6 rounded-full" />
+                  <div className="flex-1">
+                    <SkeletonLoader className="h-4 w-full mb-1" />
+                    <SkeletonLoader className="h-3 w-24" />
+                  </div>
+                </li>
+              ))
+            : recentActivities.map((activity) => (
+                <li key={activity.id} className="flex items-start space-x-3 text-sm">
+                  <AlertCircle className="text-blue-500 mt-1 flex-shrink-0" />
+                  <div>
+                    <p>{activity.message}</p>
+                    <p className="text-gray-500">{activity.time}</p>
+                  </div>
+                </li>
+              ))}
         </ul>
       </motion.div>
 
@@ -150,12 +187,20 @@ const Dashboard: React.FC = () => {
           <TrendingUp className="mr-2 text-blue-500" />
           Quick Tips
         </h3>
-        <ul className="list-disc list-inside text-sm space-y-1">
-          <li>Check weather forecast to plan for busy days</li>
-          <li>Ensure all safety equipment is properly maintained</li>
-          <li>Consider running a promotion for less popular items</li>
-          <li>Follow up with clients for feedback and reviews</li>
-        </ul>
+        {loading ? (
+          <div className="space-y-2">
+            {Array.from({ length: 4 }).map((_, index) => (
+              <SkeletonLoader key={index} className="h-4 w-full" />
+            ))}
+          </div>
+        ) : (
+          <ul className="list-disc list-inside text-sm space-y-1">
+            <li>Check weather forecast to plan for busy days</li>
+            <li>Ensure all safety equipment is properly maintained</li>
+            <li>Consider running a promotion for less popular items</li>
+            <li>Follow up with clients for feedback and reviews</li>
+          </ul>
+        )}
       </motion.div>
     </motion.div>
   );

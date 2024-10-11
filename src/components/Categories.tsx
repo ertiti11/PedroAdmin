@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Tag, Plus } from 'lucide-react';
 
 const Categories: React.FC = () => {
+  const [loading, setLoading] = useState(true);
   const [categories, setCategories] = useState([
     { id: 1, name: 'Watercraft' },
     { id: 2, name: 'Safety Equipment' },
@@ -12,12 +13,25 @@ const Categories: React.FC = () => {
 
   const [newCategory, setNewCategory] = useState('');
 
+  useEffect(() => {
+    // Simulate data loading
+    const timer = setTimeout(() => {
+      setLoading(false);
+    }, 2000);
+
+    return () => clearTimeout(timer);
+  }, []);
+
   const handleAddCategory = () => {
     if (newCategory.trim() !== '') {
       setCategories([...categories, { id: Date.now(), name: newCategory.trim() }]);
       setNewCategory('');
     }
   };
+
+  const SkeletonLoader = ({ className }: { className?: string }) => (
+    <div className={`animate-pulse bg-gray-200 rounded ${className}`}></div>
+  );
 
   return (
     <motion.div
@@ -51,20 +65,28 @@ const Categories: React.FC = () => {
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-200">
-            {categories.map((category) => (
-              <motion.tr 
-                key={category.id}
-                whileHover={{ backgroundColor: "#f3f4f6" }}
-                transition={{ duration: 0.2 }}
-              >
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <div className="flex items-center">
-                    <Tag className="h-5 w-5 text-gray-400 mr-2" />
-                    {category.name}
-                  </div>
-                </td>
-              </motion.tr>
-            ))}
+            {loading
+              ? Array.from({ length: 4 }).map((_, index) => (
+                  <tr key={index}>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <SkeletonLoader className="h-4 w-24" />
+                    </td>
+                  </tr>
+                ))
+              : categories.map((category) => (
+                  <motion.tr 
+                    key={category.id}
+                    whileHover={{ backgroundColor: "#f3f4f6" }}
+                    transition={{ duration: 0.2 }}
+                  >
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="flex items-center">
+                        <Tag className="h-5 w-5 text-gray-400 mr-2" />
+                        {category.name}
+                      </div>
+                    </td>
+                  </motion.tr>
+                ))}
           </tbody>
         </table>
       </div>
