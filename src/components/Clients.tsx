@@ -1,25 +1,27 @@
+// src/components/Clients.js
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { User, Mail, Phone } from 'lucide-react';
+import { fetchClients } from '../utils/api'; // Ajusta la ruta según tu estructura de carpetas
 
 const Clients: React.FC = () => {
   const [loading, setLoading] = useState(true);
+  const [clients, setClients] = useState([]);
 
   useEffect(() => {
-    // Simulate data loading
-    const timer = setTimeout(() => {
-      setLoading(false);
-    }, 2000);
+    const loadClients = async () => {
+      setLoading(true);
+      try {
+        const clientsData = await fetchClients();
+        setClients(clientsData);
+      } catch (error) {
+        console.error('Error loading clients:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-    return () => clearTimeout(timer);
+    loadClients();
   }, []);
-
-  const clients = [
-    { id: 1, name: 'John Doe', email: 'john@example.com', phone: '123-456-7890' },
-    { id: 2, name: 'Jane Smith', email: 'jane@example.com', phone: '987-654-3210' },
-    { id: 3, name: 'Alice Johnson', email: 'alice@example.com', phone: '456-789-0123' },
-    { id: 4, name: 'Bob Williams', email: 'bob@example.com', phone: '789-012-3456' },
-  ];
 
   const SkeletonLoader = ({ className }: { className?: string }) => (
     <div className={`animate-pulse bg-gray-200 rounded ${className}`}></div>
@@ -60,29 +62,10 @@ const Clients: React.FC = () => {
                   </tr>
                 ))
               : clients.map((client) => (
-                  <motion.tr 
-                    key={client.id}
-                    whileHover={{ backgroundColor: "#f3f4f6" }}
-                    transition={{ duration: 0.2 }}
-                  >
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="flex items-center">
-                        <User className="h-5 w-5 text-gray-400 mr-2" />
-                        {client.name}
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="flex items-center">
-                        <Mail className="h-5 w-5 text-gray-400 mr-2" />
-                        {client.email}
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="flex items-center">
-                        <Phone className="h-5 w-5 text-gray-400 mr-2" />
-                        {client.phone}
-                      </div>
-                    </td>
+                  <motion.tr key={client.id} whileHover={{ scale: 1.02 }}>
+                    <td className="px-6 py-4 whitespace-nowrap">{client.nombre}</td>
+                    <td className="px-6 py-4 whitespace-nowrap">{client.email}</td>
+                    <td className="px-6 py-4 whitespace-nowrap">{client.telefono}</td>
                   </motion.tr>
                 ))}
           </tbody>

@@ -1,25 +1,28 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Tag, Plus } from 'lucide-react';
+import { fetchCategories } from '../utils/api'; // Asegúrate de que la ruta sea correcta
 
 const Categories: React.FC = () => {
   const [loading, setLoading] = useState(true);
-  const [categories, setCategories] = useState([
-    { id: 1, name: 'Watercraft' },
-    { id: 2, name: 'Safety Equipment' },
-    { id: 3, name: 'Accessories' },
-    { id: 4, name: 'Beach Gear' },
-  ]);
-
+  const [categories, setCategories] = useState([]);
   const [newCategory, setNewCategory] = useState('');
 
   useEffect(() => {
-    // Simulate data loading
-    const timer = setTimeout(() => {
-      setLoading(false);
-    }, 2000);
+    const loadCategories = async () => {
+      setLoading(true); // Añadido para mostrar el loader antes de la carga
+      try {
+        const categoriesData = await fetchCategories();
+        setCategories(categoriesData);
+      } catch (error) {
+        // Manejo de errores si es necesario
+        console.error('Failed to load categories:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-    return () => clearTimeout(timer);
+    loadCategories();
   }, []);
 
   const handleAddCategory = () => {
