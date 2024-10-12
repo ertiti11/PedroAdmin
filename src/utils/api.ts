@@ -29,3 +29,14 @@ export const fetchClients = async () => {
       throw error; // Lanza el error para que pueda ser manejado en el componente
     }
   };
+
+  export const fetchProducts = async () => {
+    try {
+      const response = await fetch('http://localhost:8000/api/v1/productos');
+      const data = await response.json();
+      return data.data; // Devuelve la propiedad 'data'
+    } catch (error) {
+      console.error('Error fetching products:', error);
+      throw error; // Lanza el error para que pueda ser manejado en el componente
+    }
+  };

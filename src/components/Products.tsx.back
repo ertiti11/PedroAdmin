@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Package, Tag, Hash, DollarSign } from 'lucide-react';
-import {ProductCard} from './ProductCard';
+
 const Products: React.FC = () => {
   const [loading, setLoading] = useState(true);
 
@@ -61,7 +61,36 @@ const Products: React.FC = () => {
                   </tr>
                 ))
               : products.map((product) => (
-                  <ProductCard key={product.id} product={product} />
+                  <motion.tr 
+                    key={product.id}
+                    whileHover={{ backgroundColor: "#f3f4f6" }}
+                    transition={{ duration: 0.2 }}
+                  >
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="flex items-center">
+                        <Package className="h-5 w-5 text-gray-400 mr-2" />
+                        {product.name}
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="flex items-center">
+                        <Tag className="h-5 w-5 text-gray-400 mr-2" />
+                        {product.category}
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="flex items-center">
+                        <Hash className="h-5 w-5 text-gray-400 mr-2" />
+                        {product.quantity}
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="flex items-center">
+                        <DollarSign className="h-5 w-5 text-gray-400 mr-2" />
+                        {product.price}
+                      </div>
+                    </td>
+                  </motion.tr>
                 ))}
           </tbody>
         </table>
